@@ -71,44 +71,51 @@ func main() {
 	//////////////////////////////////////////////////////////////////////
 	// Iterate through volumes
 	for volumeName, volume := range data.Volumes {
-			if volume.Driver == "" {
-					// Set default driver
-					data.Volumes[volumeName].Driver = "rclone"
+		if volume.Driver == "" {
+			// Set default driver
 
-					// Set default driver options
-					data.Volumes[volumeName].DriverOpts = []string{
-							"remote='s3fs:${CLUSTER_NAME}/data'",
-							"allow_other='true'",
-							"vfs_cache_mode=full",
-							"poll_interval=0",
-					}
+			vol := data.Volumes[volumeName]
+			vol.Driver = "rclone"
+			vol.DriverOpts = []string{
+				"remote='s3fs:${CLUSTER_NAME}/data'",
+				"allow_other='true'",
+				"vfs_cache_mode=full",
+				"poll_interval=0",
 			}
+
+			data.Volumes[volumeName] = vol
+
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////////	
 	// Iterate through configs
 	for configName := range data.Configs {
 		filename := data.Configs[configName].File
+		cfg := data.Configs[configName]
 		fdata, err := ioutil.ReadFile(filename)
 		if err != nil {
 				log.Fatal(err)
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		data.Configs[configName].Name = filename+"."+md5sum
+		cfg.Name = filename+"."+md5sum
+		data.Configs[configName] = cfg
 	}
 
 	//////////////////////////////////////////////////////////////////////	
 	// Iterate through configs
 	for secretName := range data.Secrets {
 		filename := data.Secrets[secretName].File
+		scr := data.Secrets[secretName]
 		fdata, err := ioutil.ReadFile(filename)
 		if err != nil {
 				log.Fatal(err)
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		data.Secrets[secretName].Name = filename+"."+md5sum
+		scr.Name = filename+"."+md5sum
+		data.Secrets[secretName] = scr
 	}
 
 
