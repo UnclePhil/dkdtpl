@@ -48,7 +48,7 @@ type DockerCompose struct {
 func main() {
 	// get param
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: dkdfill <INfilename> <OUTfilename>")
+		fmt.Println("Usage: dkdtpl <INfilename> <OUTfilename>")
 		os.Exit(1)
 	}
 	INfilename := os.Args[1]
@@ -99,7 +99,7 @@ func main() {
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		cfg.Name = filename+"."+md5sum
+		cfg.Name = configName+"."+md5sum
 		data.Configs[configName] = cfg
 	}
 
@@ -114,7 +114,7 @@ func main() {
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		scr.Name = filename+"."+md5sum
+		scr.Name = secretName+"."+md5sum
 		data.Secrets[secretName] = scr
 	}
 

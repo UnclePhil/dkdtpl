@@ -1,0 +1,107 @@
+version: '3.5'
+
+services:
+
+  caddy-controller:
+    # image: lucaslorentz/caddy-docker-proxy:2.8.7
+    image: unclephil/caddy-docker-proxy:2.7.5-redis
+    # image: stutzlab/caddy-ingress:1.0.0
+    networks:
+      - proxy
+      - caddycontrol
+    configs:
+        - source: caddyfile
+          target: /tmp/caddyfile
+    environment:
+      - CADDY_DOCKER_MODE=controller
+      - CADDY_CONTROLLER_NETWORK=10.200.200.0/24
+      - CADDY_DOCKER_CADDYFILE_PATH=/tmp/caddyfile
+      - CADDY_INGRESS_NETWORKS=proxy
+      - CLUSTER_DOMAIN=${CLUSTER_DOMAIN}
+      - CLUSTER_NAME=${CLUSTER_NAME}
+
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  caddy-server:
+    image: unclephil/caddy-docker-proxy:2.7.5-redis
+    # image: lucaslorentz/caddy-docker-proxy:2.8.7
+    # image: stutzlab/caddy-ingress:1.0.0
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - proxy
+      - caddycontrol
+    environment:
+      - CADDY_DOCKER_MODE=server
+      - CADDY_CONTROLLER_NETWORK=10.200.200.0/24
+      - CLUSTER_DOMAIN=${CLUSTER_DOMAIN}
+      - CLUSTER_NAME=${CLUSTER_NAME}
+    volumes:
+      - ${CLUSTER_VOL}caddy:/data
+    secrets:
+      - source: cakey
+        target: /data/caddy/pki/authorities/local/root.key
+      - source: cacert
+        target: /data/caddy/pki/authorities/local/root.crt
+
+    deploy:
+      mode: global
+      labels:  ## default settings
+        - caddy_controlled_server=
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+
+
+
+
+networks:
+  proxy:
+    external: true
+    # "docker network create proxy -d overlay --attachable" in stack.pre
+  caddycontrol:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.200.200.0/24
+
+volumes: 
+  caddy:
+  toto:
+    driver: local
+
+configs:
+  caddyfile:
+    file: ./config/caddyfileCA
+
+secrets:
+  cacert:
+    file: ./secret/pkoCA.cert.pem
+  cakey:
+    file: ./secret/pkoCA.key.pem

@@ -1,0 +1,58 @@
+{
+    log default {
+        output stdout
+    }
+
+    email toto@gmail.com
+    default_sni ${CLUSTER_DOMAIN}
+    fallback_sni ${CLUSTER_DOMAIN}
+
+    servers {
+        metrics
+    }
+
+    pki {
+		ca local {
+			name "Pko Personal CA"
+			root {
+				cert /data/caddy/pki/authorities/local/root.crt
+				key  /data/caddy/pki/authorities/local/root.key
+				format pem_file
+			}
+		}
+	}
+}
+
+
+:80 {
+    header Content-Type text/html
+    respond <<HTML
+	    <html>
+	    <head><title>ERROR</title></head>
+	    <body>
+            <H2>ERROR</H2>
+            <p>Sorry, we cannot find the desired site on the {$CLUSTER_NAME} environment</p>
+            <p> </p>
+            <br>
+            <p>Served by {system.hostname} - {time.now.http}</p>
+        </body>
+	    </html>
+	HTML 404
+}
+
+:443 {
+    header Content-Type text/html
+    respond <<HTML
+	    <html>
+	    <head><title>ERROR</title></head>
+	    <body>
+            <H2>ERROR</H2>
+            <p>Sorry, we cannot find the desired site on the {$CLUSTER_NAME} environment</p>
+            <p> </p>
+            <br>
+            <p>Served by {system.hostname} - {time.now.http}</p>
+        </body>
+	    </html>
+	HTML 404
+    tls internal 
+}
