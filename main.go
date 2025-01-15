@@ -95,7 +95,7 @@ func main() {
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		data.Configs[configName].Name := filename+"."+md5sum
+		data.Configs[configName].Name = filename+"."+md5sum
 	}
 
 	//////////////////////////////////////////////////////////////////////	
@@ -108,7 +108,7 @@ func main() {
 		}
 		hash := md5.Sum(fdata)
 		md5sum := fmt.Sprintf("%x", hash)
-		data.Secrets[secretName].Name := filename+"."+md5sum
+		data.Secrets[secretName].Name = filename+"."+md5sum
 	}
 
 
