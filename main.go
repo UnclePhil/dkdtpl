@@ -5,8 +5,8 @@ import (
         "io/ioutil"
         "log"
         "os"
-        "regexp"
-        "strings"
+        // "regexp"
+        // "strings"
         "crypto/md5"
         "gopkg.in/yaml.v3"
 )
@@ -56,7 +56,7 @@ func main() {
 
 
 	// Read the Docker Compose file
-	yamlFile, err := ioutil.ReadFile(Infilename)
+	yamlFile, err := ioutil.ReadFile(INfilename)
 	if err != nil {
 			log.Fatalf("Error reading YAML file: %v", err)
 	}
@@ -87,26 +87,28 @@ func main() {
 	
 	//////////////////////////////////////////////////////////////////////	
 	// Iterate through configs
-	for configName, config := range data.Configs {
-		filename := data.Configs[configName].file
+	for configName := range data.Configs {
+		filename := data.Configs[configName].File
 		fdata, err := ioutil.ReadFile(filename)
 		if err != nil {
 				log.Fatal(err)
 		}
-		hash := md5.Sum(data)
-		data.Configs[configName].name := filename+"."+hash
+		hash := md5.Sum(fdata)
+		md5sum := fmt.Sprintf("%x", hash)
+		data.Configs[configName].Name := filename+"."+md5sum
 	}
 
 	//////////////////////////////////////////////////////////////////////	
 	// Iterate through configs
-	for secretName, secret := range data.Secrets {
-		filename := data.Secrets[secretName].file
+	for secretName := range data.Secrets {
+		filename := data.Secrets[secretName].File
 		fdata, err := ioutil.ReadFile(filename)
 		if err != nil {
 				log.Fatal(err)
 		}
-		hash := md5.Sum(data)
-		data.Secrets[secretName].name := filename+"."+hash
+		hash := md5.Sum(fdata)
+		md5sum := fmt.Sprintf("%x", hash)
+		data.Secrets[secretName].Name := filename+"."+md5sum
 	}
 
 
