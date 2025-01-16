@@ -62,25 +62,26 @@ func main() {
 	//			"vfs_cache_mode=full",
 	//			"poll_interval=0",
 	// ================================================================
+    // x
 
-	// var DKDdriver string
-	// var DKDdriveropts string
-	// var INfilename string
-	// var OUTfilename string
+	var DKDdriver string
+	var DKDdriveropts string
+	var INfilename string
+	var OUTfilename string
 
-	INfilename := os.Args[1]
-	OUTfilename := os.Args[2]
+	INfilename = os.Args[1]
+	OUTfilename = os.Args[2]
 
 	if os.Args[3] == "" { 
-		DKDdriver := "local"
+		DKDdriver = "local"
 	} else {
-		DKDdriver := os.Args[3]
+		DKDdriver = os.Args[3]
 	} 
 
 	if os.Args[4] == "" { 
-		DKDdriveropts := ""
+		DKDdriveropts = ""
 	} else {
-		DKDdriveropts := os.Args[4]
+		DKDdriveropts = os.Args[4]
 	} 
 
 
