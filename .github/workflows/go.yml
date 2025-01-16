@@ -25,3 +25,9 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: upload artifact
+      uses: actions/upload-artifact@v4 
+      with:
+        name: dkdtpl Release
+        path: dktpl 
+
