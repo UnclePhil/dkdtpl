@@ -63,19 +63,24 @@ func main() {
 	//			"poll_interval=0",
 	// ================================================================
 
-
+	var DKDdriver string
+	var DKDdriveropts string
+	var INfilename string
+	var OUTfilename string
+	
 	INfilename := os.Args[1]
 	OUTfilename := os.Args[2]
-	if os.Args[3] ="" { 
+
+	if os.Args[3] == "" { 
 		DKDdriver := "local"
 	} else {
 		DKDdriver := os.Args[3]
 	} 
 
-	if os.Args[4] ="" { 
-		DKDdriveropts := "local"
+	if os.Args[4] == "" { 
+		DKDdriveropts := ""
 	} else {
-		DKDdriveropts := os.Args[3]
+		DKDdriveropts := os.Args[4]
 	} 
 
 
@@ -99,13 +104,15 @@ func main() {
 			// Set default driver
 
 			vol := data.Volumes[volumeName]
-			vol.Driver = DKDdriver
-			vol.DriverOpts = []string{
-				"remote='s3fs:${CLUSTER_NAME}/data'",
-				"allow_other='true'",
-				"vfs_cache_mode=full",
-				"poll_interval=0",
-			}
+			vol.Driver := DKDdriver
+			vol.DriverOpts := []string{ DKDdriveropts }
+
+// 			vol.DriverOpts = []string{
+//				"remote='s3fs:${CLUSTER_NAME}/data'",
+//				"allow_other='true'",
+//				"vfs_cache_mode=full",
+//				"poll_interval=0",
+//			}
 
 			data.Volumes[volumeName] = vol
 
