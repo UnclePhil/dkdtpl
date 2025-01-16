@@ -65,7 +65,7 @@ func main() {
     // x
 
 	var DKDdriver string
-	var DKDdriveropts string
+	var DKDdriveropts []string
 	var INfilename string
 	var OUTfilename string
 
@@ -79,9 +79,9 @@ func main() {
 	} 
 
 	if os.Args[4] == "" { 
-		DKDdriveropts = ""
+		DKDdriveropts = []
 	} else {
-		DKDdriveropts = os.Args[4]
+		DKDdriveropts = strings.Split(os.Args[4], ",")
 	} 
 
 
@@ -106,7 +106,7 @@ func main() {
 
 			vol := data.Volumes[volumeName]
 			vol.Driver = DKDdriver
-			vol.DriverOpts = []string{ DKDdriveropts }
+			vol.DriverOpts = DKDdriveropts
 
 // 			vol.DriverOpts = []string{
 //				"remote='s3fs:${CLUSTER_NAME}/data'",
