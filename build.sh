@@ -14,4 +14,4 @@ sudo chown -R $(id -u):$(id -g) ./bin
 mv .gitold .git
 
 ## run test
-./test.sh
+## ./test.sh
