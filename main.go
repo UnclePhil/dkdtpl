@@ -63,11 +63,11 @@ func main() {
 	//			"poll_interval=0",
 	// ================================================================
 
-	var DKDdriver string
-	var DKDdriveropts string
-	var INfilename string
-	var OUTfilename string
-	
+	// var DKDdriver string
+	// var DKDdriveropts string
+	// var INfilename string
+	// var OUTfilename string
+
 	INfilename := os.Args[1]
 	OUTfilename := os.Args[2]
 
@@ -104,8 +104,8 @@ func main() {
 			// Set default driver
 
 			vol := data.Volumes[volumeName]
-			vol.Driver := DKDdriver
-			vol.DriverOpts := []string{ DKDdriveropts }
+			vol.Driver = DKDdriver
+			vol.DriverOpts = []string{ DKDdriveropts }
 
 // 			vol.DriverOpts = []string{
 //				"remote='s3fs:${CLUSTER_NAME}/data'",
