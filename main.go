@@ -78,9 +78,7 @@ func main() {
 		DKDdriver = os.Args[3]
 	} 
 
-	if os.Args[4] == "" { 
-		DKDdriveropts = []string
-	} else {
+	if os.Args[4] != "" { 
 		DKDdriveropts = strings.Split(os.Args[4], ",")
 	} 
 
