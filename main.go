@@ -79,7 +79,7 @@ func main() {
 	} 
 
 	if os.Args[4] == "" { 
-		DKDdriveropts = ""
+		DKDdriveropts = []string
 	} else {
 		DKDdriveropts = strings.Split(os.Args[4], ",")
 	} 
