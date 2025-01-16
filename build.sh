@@ -14,7 +14,4 @@ sudo chown -R $(id -u):$(id -g) ./bin
 mv .gitold .git
 
 ## run test
-cd test 
-../bin/dkdtpl stack.yml stack.tmp "toto" "toto1","toto2","toto3"
-cat stack.tmp
-cd ..
+./test.sh
