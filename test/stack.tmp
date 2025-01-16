@@ -89,11 +89,11 @@ volumes:
 configs:
     caddyfile:
         file: ./config/caddyfileCA
-        name: caddyfile.1b3bbe6a208b94e4535dd222a0c79c23
+        name: caddyfile.29c940aa6ef76796e53ef1938084db47
 secrets:
     cacert:
         file: ./secret/pkoCA.cert.pem
-        name: cacert.c858d7fdfbb238c1b9fef3437af72510
+        name: cacert.3125de1365bb16d9f9498ebb045f034e
     cakey:
         file: ./secret/pkoCA.key.pem
-        name: cakey.119d67fb793e3cbdd6d9a8ddd939a1de
+        name: cakey.05967cd50da12561ec9cf4edbaf3cb37

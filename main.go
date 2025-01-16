@@ -51,8 +51,32 @@ func main() {
 		fmt.Println("Usage: dkdtpl <INfilename> <OUTfilename>")
 		os.Exit(1)
 	}
+	/////// Args
+	// 1: Infilename  docker-stack.yml original  mandatory
+	// 2: OUTfilename : the output file  mandatory
+	// 3: Volume driver : default: local   any other value  
+	// 4: Volume driver options : all options separate by comma    
+	// ex: 
+	//			"remote='s3fs:${CLUSTER_NAME}/data'",
+	//			"allow_other='true'",
+	//			"vfs_cache_mode=full",
+	//			"poll_interval=0",
+	// ================================================================
+
+
 	INfilename := os.Args[1]
 	OUTfilename := os.Args[2]
+	if os.Args[3] ="" { 
+		DKDdriver := "local"
+	} else {
+		DKDdriver := os.Args[3]
+	} 
+
+	if os.Args[4] ="" { 
+		DKDdriveropts := "local"
+	} else {
+		DKDdriveropts := os.Args[3]
+	} 
 
 
 	// Read the Docker Compose file
@@ -75,7 +99,7 @@ func main() {
 			// Set default driver
 
 			vol := data.Volumes[volumeName]
-			vol.Driver = "rclone"
+			vol.Driver = DKDdriver
 			vol.DriverOpts = []string{
 				"remote='s3fs:${CLUSTER_NAME}/data'",
 				"allow_other='true'",
