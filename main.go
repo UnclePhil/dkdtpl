@@ -13,7 +13,7 @@ import (
 
 type Volume struct {
         Driver     string            `yaml:"driver,omitempty"`
-        DriverOpts []string          `yaml:"driver_opts,omitempty"`
+        DriverOpts map[string]string          `yaml:"driver_opts,omitempty"`
 }
 
 type Volumes map[string]Volume
@@ -46,9 +46,13 @@ type DockerCompose struct {
 
 
 func main() {
-	// get param
+	// display version 
+	var version = "1.0.0"
+	fmt.Printf("dkdtpl: with <3 by UnclePhil - %s\n", version)	
+
+	// check param
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: dkdtpl <INfilename> <OUTfilename>")
+		fmt.Println("    Usage: dkdtpl <INfilename> <OUTfilename> [voldriver  [voldriveropts]]\n ")
 		os.Exit(1)
 	}
 	/////// Args
@@ -63,27 +67,49 @@ func main() {
 	//			"poll_interval=0",
 	// ================================================================
     // x
-
+	
+	////// Variables ////////////////////////////////////////////////
 	var DKDdriver string 
-	var DKDdriveropts []string
 	var INfilename string
 	var OUTfilename string
+	var DKDdriveropts map[string]string
+	
+	DKDdriveropts = make(map[string]string)
 
 	INfilename = os.Args[1]
 	OUTfilename = os.Args[2]
-
+	
+	//////////////////////////////////////////////////////////////////
+	// Set default volume driver
+	// driver name
 	if len(os.Args) > 3 && os.Args[3] != "" { 
 			DKDdriver = os.Args[3]
 		} else {
 			DKDdriver = "local"
 	} 
+	// driver options 
 	if len(os.Args) > 4 {	
 		if os.Args[4] != "" { 
-			DKDdriveropts = strings.Split(os.Args[4], ",")
+			//DKDdriveropts = strings.Split(os.Args[4], ",")
+			// Split the input string by comma
+			items := strings.Split(os.Args[4], ",")
+			// Create a map to store the key-value pairs
+			// DKDdriveropts := make(map[string]string)
+
+			// Iterate through the items and extract key-value pairs
+			for _, item := range items {
+					parts := strings.Split(item, "=")
+					if len(parts) == 2 {
+							key := parts[0]
+							value := parts[1]
+							DKDdriveropts[key] = value
+					}
+			}
 		} 
 	}
 
 
+	///////////////////////////////////////////////////////////////////
 	// Read the Docker Compose file
 	yamlFile, err := ioutil.ReadFile(INfilename)
 	if err != nil {
@@ -106,14 +132,6 @@ func main() {
 			vol := data.Volumes[volumeName]
 			vol.Driver = DKDdriver
 			vol.DriverOpts = DKDdriveropts
-
-// 			vol.DriverOpts = []string{
-//				"remote='s3fs:${CLUSTER_NAME}/data'",
-//				"allow_other='true'",
-//				"vfs_cache_mode=full",
-//				"poll_interval=0",
-//			}
-
 			data.Volumes[volumeName] = vol
 
 		}
@@ -121,6 +139,7 @@ func main() {
 	
 	//////////////////////////////////////////////////////////////////////	
 	// Iterate through configs
+	//   add name with md5 value
 	for configName := range data.Configs {
 		filename := data.Configs[configName].File
 		cfg := data.Configs[configName]
@@ -135,7 +154,8 @@ func main() {
 	}
 
 	//////////////////////////////////////////////////////////////////////	
-	// Iterate through configs
+	// Iterate through secrets
+	//   add name with md5 value
 	for secretName := range data.Secrets {
 		filename := data.Secrets[secretName].File
 		scr := data.Secrets[secretName]
@@ -149,8 +169,7 @@ func main() {
 		data.Secrets[secretName] = scr
 	}
 
-
-
+	//////////////////////////////////////////////////////////////////////
 	// Marshal the modified data back to YAML
 	modifiedYaml, err := yaml.Marshal(data)
 	if err != nil {
