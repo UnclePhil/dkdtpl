@@ -1,0 +1,106 @@
+version: "3.5"
+services:
+    caddy-controller:
+        configs:
+            - source: caddyfile
+              target: /tmp/caddyfile
+        deploy:
+            labels:
+                environment: prod
+                labelledecadix: adesyeuxdevelour
+                owner: koenigphil
+                team: devops
+            placement:
+                constraints:
+                    - node.role == manager
+            resources:
+                limits:
+                    memory: 128M
+                reservations:
+                    memory: 64M
+            restart_policy:
+                condition: on-failure
+            update_config:
+                delay: 10s
+                order: start-first
+                parallelism: 1
+        environment:
+            - CADDY_DOCKER_MODE=controller
+            - CADDY_CONTROLLER_NETWORK=10.200.200.0/24
+            - CADDY_DOCKER_CADDYFILE_PATH=/tmp/caddyfile
+            - CADDY_INGRESS_NETWORKS=proxy
+            - CLUSTER_DOMAIN=${CLUSTER_DOMAIN}
+            - CLUSTER_NAME=${CLUSTER_NAME}
+        image: unclephil/caddy-docker-proxy:2.7.5-redis
+        networks:
+            - proxy
+            - caddycontrol
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    caddy-server:
+        deploy:
+            labels:
+                environment: prod
+                owner: koenigphil
+                team: devops
+            mode: global
+            resources:
+                limits:
+                    memory: 256M
+                reservations:
+                    memory: 64M
+            restart_policy:
+                condition: on-failure
+            update_config:
+                delay: 10s
+                order: start-first
+                parallelism: 1
+        environment:
+            - CADDY_DOCKER_MODE=server
+            - CADDY_CONTROLLER_NETWORK=10.200.200.0/24
+            - CLUSTER_DOMAIN=${CLUSTER_DOMAIN}
+            - CLUSTER_NAME=${CLUSTER_NAME}
+        image: unclephil/caddy-docker-proxy:2.7.5-redis
+        networks:
+            - proxy
+            - caddycontrol
+        ports:
+            - 80:80
+            - 443:443
+        secrets:
+            - source: cakey
+              target: /data/caddy/pki/authorities/local/root.key
+            - source: cacert
+              target: /data/caddy/pki/authorities/local/root.crt
+        volumes:
+            - ${CLUSTER_VOL}caddy:/data
+networks:
+    caddycontrol:
+        driver: overlay
+        ipam:
+            config:
+                - subnet: 10.200.200.0/24
+            driver: default
+    proxy:
+        external: true
+volumes:
+    caddy:
+        driver: rclone
+        driver_opts:
+            allow_other: "true"
+            poll_interval: "0"
+            remote: s3fs://data
+            vfs_cache_mode: full
+    toto:
+        driver: local
+configs:
+    caddyfile:
+        file: ./config/caddyfileCA
+        name: caddyfile.29c940aa6ef76796e53ef1938084db47
+secrets:
+    cacert:
+        file: ./secret/pkoCA.cert.pem
+        name: cacert.3125de1365bb16d9f9498ebb045f034e
+    cakey:
+        file: ./secret/pkoCA.key.pem
+        name: cakey.05967cd50da12561ec9cf4edbaf3cb37

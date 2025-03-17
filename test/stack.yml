@@ -35,6 +35,8 @@ services:
         order: start-first
       restart_policy:
         condition: on-failure
+      labels:
+        labelledecadix: adesyeuxdevelour
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -60,11 +62,10 @@ services:
         target: /data/caddy/pki/authorities/local/root.key
       - source: cacert
         target: /data/caddy/pki/authorities/local/root.crt
-
     deploy:
       mode: global
-      labels:  ## default settings
-        - caddy_controlled_server=
+      labels:
+        - caddy_controlled_server=true
       resources:
         limits:
           memory: 256M
